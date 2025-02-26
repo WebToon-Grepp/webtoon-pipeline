@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath("/opt/airflow/crawler"))
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
 
 from crawler.kakao import fetcher
 
@@ -26,5 +27,13 @@ with DAG(
         python_callable=run_historical_data,
         dag=dag
     )
+
+    upload_dir_to_s3_task = LocalFoldersystemToS3Operator(
+        task_id="upload_dir_to_s3",
+        folder="output/raw/kakao", 
+        folder_key="output",
+        dest_bucket="wt-grepp-lake", 
+        replace=True
+    )
     
-    run_historical_data_task
+    run_historical_data_task >> upload_dir_to_s3_task

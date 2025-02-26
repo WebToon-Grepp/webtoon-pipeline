@@ -7,13 +7,13 @@ sys.path.insert(0, os.path.abspath("/opt/airflow/crawler"))
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
 
 from crawler.kakao import fetcher
 
 def run_daily_data(**kwargs):
     execution_date = kwargs['execution_date']
     target_day = execution_date.weekday()
-    print(target_day)
 
     fetcher.fetch_daily_data(target_day)
 
@@ -30,5 +30,13 @@ with DAG(
         python_callable=run_daily_data,
         dag=dag
     )
+
+    upload_dir_to_s3_task = LocalFoldersystemToS3Operator(
+        task_id="upload_dir_to_s3",
+        folder="output/raw/kakao", 
+        folder_key="output",
+        dest_bucket="wt-grepp-lake", 
+        replace=True
+    )
     
-    run_daily_data_task
+    run_daily_data_task >> upload_dir_to_s3_task

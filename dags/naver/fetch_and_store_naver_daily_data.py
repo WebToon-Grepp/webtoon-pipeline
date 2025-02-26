@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.abspath("/opt/airflow/crawler"))
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
 
 from crawler.naver import fetcher
 
@@ -30,5 +31,13 @@ with DAG(
         python_callable=run_daily_data,
         dag=dag
     )
+
+    upload_dir_to_s3_task = LocalFoldersystemToS3Operator(
+        task_id="upload_dir_to_s3",
+        folder="output/raw/naver", 
+        folder_key="output",
+        dest_bucket="wt-grepp-lake", 
+        replace=True
+    )
     
-    run_daily_data_task
+    run_daily_data_task >> upload_dir_to_s3_task
