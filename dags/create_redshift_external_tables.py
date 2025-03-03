@@ -87,22 +87,22 @@ with DAG(
 ) as dag:
     
     create_schema_task = PythonOperator(
-        task_id='create_external_redshift_schema',
+        task_id="create_external_redshift_schema",
         python_callable=create_external_redshift_schema,
     )
 
     create_titles_task = PythonOperator(
-        task_id='create_external_titles_table',
+        task_id="create_external_titles_table",
         python_callable=create_external_titles_table,
     )
 
     create_episodes_task = PythonOperator(
-        task_id='create_external_episodes_table',
+        task_id="create_external_episodes_table",
         python_callable=create_external_episodes_table,
     )
 
     create_genres_task = PythonOperator(
-        task_id='create_external_genres_table',
+        task_id="create_external_genres_table",
         python_callable=create_external_genres_table,
     )
 

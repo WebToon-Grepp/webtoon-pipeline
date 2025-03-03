@@ -17,7 +17,7 @@ def add_partition(target, **kwargs):
     day = execution_date.day
 
     redshift_hook = RedshiftHook()
-    for platform in ['naver', 'kakao']:
+    for platform in ["naver", "kakao"]:
         query = f"""
             ALTER TABLE external.{target}
             ADD PARTITION (year = {year}, month = {month:02d}, day = {day:02d}, platform = '{platform}')
@@ -33,18 +33,21 @@ with DAG(
     tags=["partition", "s3", "external", "redshift"],
 ) as dag:
     add_titles_task = PythonOperator(
-        task_id='add_partition_titles_table',
+        task_id="add_partition_titles_table",
         python_callable=add_partition,
+        op_args=["titles"]
     )
 
     add_episodes_task = PythonOperator(
-        task_id='add_partition_episodes_table',
+        task_id="add_partition_episodes_table",
         python_callable=add_partition,
+        op_args=["episodes"]
     )
 
     add_genres_task = PythonOperator(
-        task_id='add_partition_genres_table',
+        task_id="add_partition_genres_table",
         python_callable=add_partition,
+        op_args=["genres"]
     )
 
     [add_titles_task, add_episodes_task, add_genres_task]

@@ -10,6 +10,8 @@ class RedshiftHook():
 
     def execute_query(self, query=None, autocommit=True):
         if not query:
+            if not self.query:
+                raise Exception("Query not provided and no default query found.")
             query = self.query
         print(query)
 
