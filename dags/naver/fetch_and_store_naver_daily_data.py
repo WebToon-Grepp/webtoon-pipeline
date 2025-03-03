@@ -21,7 +21,7 @@ def fetch_data(**kwargs):
 
 with DAG(
     dag_id="fetch_and_store_naver_daily_data",
-    schedule_interval="0 23 * * *",
+    schedule_interval="0 9 * * *", # 한국 시간 18시
     start_date=datetime(2025, 2, 26),
     catchup=False,
     tags=["daily", "spark", "store", "s3", "fetch", "crawler", "naver"],

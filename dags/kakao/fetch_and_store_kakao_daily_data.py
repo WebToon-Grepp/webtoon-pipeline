@@ -21,7 +21,7 @@ def fetch_data(**kwargs):
 
 with DAG(
     dag_id="fetch_and_store_kakao_daily_data",
-    schedule_interval="0 9 * * *",
+    schedule_interval="0 10 * * *", # 한국 시간 19시
     start_date=datetime(2025, 2, 26),
     catchup=False,
     tags=["daily", "spark", "store", "s3", "fetch", "crawler", "kakao"],
