@@ -11,7 +11,7 @@ from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
 
 from crawler.naver import fetcher
 
-def run_historical_data(**kwargs):
+def fetch_data(**kwargs):
     fetcher.fetch_all_historical_data()
 
 with DAG(
@@ -22,18 +22,18 @@ with DAG(
     tags=["historical", "store", "s3", "fetch", "crawler", "naver"],
 ) as dag:
     
-    run_historical_data_task = PythonOperator(
-        task_id="run_daily_data",
-        python_callable=run_historical_data,
+    fetch_data_task = PythonOperator(
+        task_id="fetch_data",
+        python_callable=fetch_data,
         dag=dag
     )
-    
-    upload_dir_to_s3_task = LocalFoldersystemToS3Operator(
-        task_id="upload_dir_to_s3",
+
+    upload_raw_data_to_s3_task = LocalFoldersystemToS3Operator(
+        task_id="upload_raw_data_to_s3",
         folder="output/raw/naver", 
         folder_key="output",
         dest_bucket="wt-grepp-lake", 
         replace=True
     )
     
-    run_historical_data_task >> upload_dir_to_s3_task
+    fetch_data_task >> upload_raw_data_to_s3_task
