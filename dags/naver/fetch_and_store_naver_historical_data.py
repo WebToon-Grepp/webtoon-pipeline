@@ -24,8 +24,7 @@ with DAG(
     
     fetch_data_task = PythonOperator(
         task_id="fetch_data",
-        python_callable=fetch_data,
-        dag=dag
+        python_callable=fetch_data
     )
 
     upload_raw_data_to_s3_task = LocalFoldersystemToS3Operator(
