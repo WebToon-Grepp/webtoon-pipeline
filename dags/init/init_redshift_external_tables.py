@@ -8,6 +8,7 @@ from airflow import DAG
 from airflow.models.variable import Variable
 from airflow.operators.python import PythonOperator
 from plugins.redshift_hook import RedshiftHook
+from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 DATABASE = "wt-grepp-spectrum"
 BUCKET = "wt-grepp-lake"
@@ -79,31 +80,36 @@ def create_external_genres_table(**kwargs):
     redshift_hook.execute_query()
 
 with DAG(
-    dag_id="create_redshift_external_tables",
+    dag_id="init_redshift_external_tables",
     schedule_interval="@once",
     start_date=datetime(2025, 2, 26),
     catchup=False,
-    tags=["create", "s3", "external", "redshift"],
+    on_success_callback=dag_success_alert,
+    tags=["init", "create", "s3", "external", "redshift"],
 ) as dag:
     
     create_schema_task = PythonOperator(
         task_id="create_external_redshift_schema",
         python_callable=create_external_redshift_schema,
+        on_failure_callback=[task_failure_alert]
     )
 
     create_titles_task = PythonOperator(
         task_id="create_external_titles_table",
         python_callable=create_external_titles_table,
+        on_failure_callback=[task_failure_alert]
     )
 
     create_episodes_task = PythonOperator(
         task_id="create_external_episodes_table",
         python_callable=create_external_episodes_table,
+        on_failure_callback=[task_failure_alert]
     )
 
     create_genres_task = PythonOperator(
         task_id="create_external_genres_table",
         python_callable=create_external_genres_table,
+        on_failure_callback=[task_failure_alert]
     )
 
     create_schema_task >> [create_titles_task, create_episodes_task, create_genres_task]
