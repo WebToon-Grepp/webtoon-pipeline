@@ -14,7 +14,7 @@ from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
 from crawler.naver import fetcher
 
 def fetch_data(**kwargs):
-    execution_date = kwargs['execution_date']
+    execution_date = datetime.now()
     target_day = execution_date.weekday()
     
     fetcher.fetch_daily_data(target_day)
@@ -29,8 +29,7 @@ with DAG(
     
     fetch_data_task = PythonOperator(
         task_id="fetch_data",
-        python_callable=fetch_data,
-        dag=dag
+        python_callable=fetch_data
     )
 
     upload_raw_data_to_s3_task = LocalFoldersystemToS3Operator(
@@ -48,8 +47,7 @@ with DAG(
         conf={
             "spark.hadoop.fs.s3a.access.key": Variable.get("aws_access_key"),
             "spark.hadoop.fs.s3a.secret.key": Variable.get("aws_secret_key"),
-        }, 
-        dag=dag
+        }
     )
 
     fetch_data_task >> upload_raw_data_to_s3_task >> transform_data_task
