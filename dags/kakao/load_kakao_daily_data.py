@@ -21,7 +21,7 @@ def add_partition(target, **kwargs):
     query = f"""
         ALTER TABLE external.{target}
         ADD PARTITION (year = {year}, month = {month:02d}, day = {day:02d}, platform = 'kakao')
-        LOCATION 's3://{BUCKET}/processed/{target}/year={year}/month={month:02d}/day={day:02d}/platform={platform}/';
+        LOCATION 's3://{BUCKET}/processed/{target}/year={year}/month={month:02d}/day={day:02d}/platform=kakao/';
     """
     redshift_hook.execute_query(query=query)
 
