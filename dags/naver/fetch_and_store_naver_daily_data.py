@@ -6,9 +6,8 @@ sys.path.insert(0, os.path.abspath("/opt/airflow"))
 sys.path.insert(0, os.path.abspath("/opt/airflow/crawler"))
 
 from airflow import DAG
-from airflow.models.variable import Variable
 from airflow.operators.python import PythonOperator
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
 
 from crawler.naver import fetcher
@@ -21,10 +20,10 @@ def fetch_data(**kwargs):
 
 with DAG(
     dag_id="fetch_and_store_naver_daily_data",
-    schedule_interval="0 9 * * *", # 한국 시간 18시
+    schedule_interval="0 3 * * *", # 한국 시간 12시
     start_date=datetime(2025, 2, 26),
     catchup=False,
-    tags=["daily", "spark", "store", "s3", "fetch", "crawler", "naver"],
+    tags=["daily", "store", "s3", "fetch", "crawler", "naver"],
 ) as dag:
     
     fetch_data_task = PythonOperator(
@@ -40,14 +39,10 @@ with DAG(
         replace=True
     )
 
-    transform_data_task = SparkSubmitOperator(
-        task_id="transform_data",
-        application="/opt/airflow/crawler/naver/processer.py", 
-        packages="org.apache.hadoop:hadoop-aws:3.2.2",
-        conf={
-            "spark.hadoop.fs.s3a.access.key": Variable.get("aws_access_key"),
-            "spark.hadoop.fs.s3a.secret.key": Variable.get("aws_secret_key"),
-        }
+    trigger_process_task = TriggerDagRunOperator(
+        task_id="trigger_process",
+        trigger_dag_id="process_naver_daily_data",
+        wait_for_completion=False
     )
 
-    fetch_data_task >> upload_raw_data_to_s3_task >> transform_data_task
+    fetch_data_task >> upload_raw_data_to_s3_task >> trigger_process_task

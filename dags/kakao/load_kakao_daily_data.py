@@ -17,21 +17,21 @@ def add_partition(target, **kwargs):
     day = execution_date.day
 
     redshift_hook = RedshiftHook()
-    for platform in ["naver", "kakao"]:
-        query = f"""
-            ALTER TABLE external.{target}
-            ADD PARTITION (year = {year}, month = {month:02d}, day = {day:02d}, platform = '{platform}')
-            LOCATION 's3://{BUCKET}/processed/{target}/year={year}/month={month:02d}/day={day:02d}/platform={platform}/';
-        """
-        redshift_hook.execute_query(query=query)
+    query = f"""
+        ALTER TABLE external.{target}
+        ADD PARTITION (year = {year}, month = {month:02d}, day = {day:02d}, platform = 'kakao')
+        LOCATION 's3://{BUCKET}/processed/{target}/year={year}/month={month:02d}/day={day:02d}/platform={platform}/';
+    """
+    redshift_hook.execute_query(query=query)
 
 with DAG(
-    dag_id="add_partition_redshift_table",
-    schedule_interval="30 10 * * *", # 한국 시간 19시 30분
+    dag_id="load_kakao_daily_data",
+    schedule_interval=None, # process_kakao_daily_data Trigger
     start_date=datetime(2025, 2, 26),
     catchup=False,
-    tags=["partition", "s3", "external", "redshift"],
+    tags=["daily", "redshift", "s3", "load", "kakao"],
 ) as dag:
+    
     add_titles_task = PythonOperator(
         task_id="add_partition_titles_table",
         python_callable=add_partition,
