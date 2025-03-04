@@ -9,6 +9,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
+from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 from crawler.kakao import fetcher
 
@@ -23,12 +24,14 @@ with DAG(
     schedule_interval="0 3 * * *", # 한국 시간 12시
     start_date=datetime(2025, 2, 26),
     catchup=False,
+    on_success_callback=dag_success_alert,
     tags=["daily", "store", "s3", "fetch", "crawler", "kakao"],
 ) as dag:
     
     fetch_data_task = PythonOperator(
         task_id="fetch_data",
-        python_callable=fetch_data
+        python_callable=fetch_data,
+        on_failure_callback=[task_failure_alert]
     )
 
     upload_raw_data_to_s3_task = LocalFoldersystemToS3Operator(
@@ -36,7 +39,8 @@ with DAG(
         folder="output/raw/kakao", 
         folder_key="output",
         dest_bucket="wt-grepp-lake", 
-        replace=True
+        replace=True,
+        on_failure_callback=[task_failure_alert]
     )
 
     trigger_process_task = TriggerDagRunOperator(
