@@ -41,10 +41,14 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 4. `execute_dbt_analytics`
     - 웨어하우스의 데이터를 실사용할 데이터로 변환
     - 트리거 시점: `load_<platform>_daily_data`가 완료된 후 자동으로 실행 (현재 미지정)
-5. `fetch_and_store_<platform>_historical_data`
-    - 과거부터 현재까지 모든 웹툰 데이터를 수집 (최초 1회 실행)
-6. `create_redshift_external_tables`
-    - Redshift 외부 데이터베이스 및 테이블을 생성 (최초 1회 실행)
+
+### Init Dag
+이 DAG들은 최초 프로젝트 시작 시에 한 번만 실행되며, 이후에는 재실행하지 않아도 됩니다.
+
+1. `init_<platform>_historical_data`
+    - 과거부터 현재까지 모든 웹툰 데이터를 수집
+2. `init_redshift_external_tables`
+    - Redshift 외부 데이터베이스 및 테이블을 생성
 
 ### DAG Flow
 이 모든 작업은 순차적으로 트리거가 걸려 실행되며 흐름은 다음과 같습니다.
