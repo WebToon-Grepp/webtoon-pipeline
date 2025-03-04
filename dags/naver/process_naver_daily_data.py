@@ -16,7 +16,7 @@ with DAG(
     start_date=datetime(2025, 2, 26),
     catchup=False,
     on_success_callback=dag_success_alert,
-    tags=["daily", "spark", "s3", "process", "naver"],
+    tags=["trigger", "daily", "spark", "s3", "process", "naver"],
 ) as dag:
     
     transform_data_task = SparkSubmitOperator(

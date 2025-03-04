@@ -31,7 +31,7 @@ with DAG(
     start_date=datetime(2025, 2, 26),
     catchup=False,
     on_success_callback=dag_success_alert,
-    tags=["daily", "redshift", "s3", "load", "kakao"],
+    tags=["trigger", "daily", "redshift", "s3", "load", "kakao"],
 ) as dag:
     
     add_titles_task = PythonOperator(

@@ -6,10 +6,10 @@ DBT_PROJECT_DIR = '/opt/airflow/analytics'
 
 with DAG(
     dag_id="execute_dbt_analytics",
-    schedule_interval="0 11 * * *", # 한국 시간 20시
+    schedule_interval=None, # Trigger
     start_date=datetime(2025, 2, 26), 
     catchup=False, 
-    tags=["analytics", "dbt"],
+    tags=["trigger", "analytics", "dbt", "redshift"], 
 ) as dag:
     
     run_dbt_model_task = BashOperator(
