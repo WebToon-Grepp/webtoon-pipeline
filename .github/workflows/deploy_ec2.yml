@@ -27,9 +27,16 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Deploy Amazon EC2 task definition
+    - name: Pull Latest Code from webtoon-pipeline
       run: |
         aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --instance-ids  $EC2_INSTANCE_ID \
           --parameters commands="cd $EC2_REPOSITORY && sudo -u $EC2_USER git pull origin master"
+          
+    - name: Pull Latest Code from webtoon-crawler
+      run: |
+        aws ssm send-command \
+          --document-name "AWS-RunShellScript" \
+          --instance-ids  $EC2_INSTANCE_ID \
+          --parameters commands="cd $EC2_REPOSITORY/crawler && sudo -u $EC2_USER git pull origin master"
