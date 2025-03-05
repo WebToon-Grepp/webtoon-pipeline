@@ -29,25 +29,15 @@ jobs:
 
     - name: Pull Latest Code from webtoon-pipeline
       run: |
-        aws ssm send-command \
-          --document-name "AWS-RunShellScript" \
-          --instance-ids  $EC2_INSTANCE_ID \
-          --parameters commands="cd $EC2_REPOSITORY && sudo -u $EC2_USER git pull origin master"
-          
-    - name: Pull Latest Code from webtoon-crawler
-      run: |
-        # Send the command
         command_id=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --instance-ids $EC2_INSTANCE_ID \
-          --parameters commands="cd $EC2_REPOSITORY/crawler && sudo -u $EC2_USER git pull origin master" \
+          --parameters commands="cd $EC2_REPOSITORY && sudo -u $EC2_USER git pull origin master" \
           --query "Command.CommandId" \
           --output text)
 
-        # Wait for the command to complete
-        echo "Command sent. Waiting for completion..."
+        echo "Command sent. Waiting for $command_id..."
 
-        # Check the status of the command
         status=$(aws ssm list-command-invocations \
           --command-id $command_id \
           --query "CommandInvocations[0].Status" \
@@ -55,8 +45,30 @@ jobs:
 
         echo "Command status: $status"
 
-        # Handle failure
         if [[ "$status" != "Success" ]]; then
           echo "Command failed with status: $status"
-          exit 1  # Fail the workflow if the command fails
+          exit 1
+        fi
+          
+    - name: Pull Latest Code from webtoon-crawler
+      run: |
+        command_id=$(aws ssm send-command \
+          --document-name "AWS-RunShellScript" \
+          --instance-ids $EC2_INSTANCE_ID \
+          --parameters commands="cd $EC2_REPOSITORY/crawler && sudo -u $EC2_USER git pull origin master" \
+          --query "Command.CommandId" \
+          --output text)
+
+        echo "Command sent. Waiting for $command_id..."
+
+        status=$(aws ssm list-command-invocations \
+          --command-id $command_id \
+          --query "CommandInvocations[0].Status" \
+          --output text)
+
+        echo "Command status: $status"
+
+        if [[ "$status" != "Success" ]]; then
+          echo "Command failed with status: $status"
+          exit 1
         fi
