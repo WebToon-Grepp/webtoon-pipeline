@@ -38,11 +38,17 @@ jobs:
 
         echo "Command sent. Waiting for $command_id..."
 
-        status=$(aws ssm list-command-invocations \
-          --command-id $command_id \
-          --query "CommandInvocations[0].Status" \
-          --output text)
+        status="InProgress"
+        while [[ "$status" == "InProgress" ]]; do
+          status=$(aws ssm list-command-invocations \
+            --command-id $command_id \
+            --query "CommandInvocations[0].Status" \
+            --output text)
 
+          echo "..."
+          sleep 1
+        done
+        
         echo "Command status: $status"
 
         if [[ "$status" != "Success" ]]; then
@@ -61,10 +67,16 @@ jobs:
 
         echo "Command sent. Waiting for $command_id..."
 
-        status=$(aws ssm list-command-invocations \
-          --command-id $command_id \
-          --query "CommandInvocations[0].Status" \
-          --output text)
+        status="InProgress"
+        while [[ "$status" == "InProgress" ]]; do
+          status=$(aws ssm list-command-invocations \
+            --command-id $command_id \
+            --query "CommandInvocations[0].Status" \
+            --output text)
+
+          echo "..."
+          sleep 1
+        done
 
         echo "Command status: $status"
 
