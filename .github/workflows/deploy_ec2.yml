@@ -1,0 +1,35 @@
+name: Deploy to Amazon EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+
+env:
+  EC2_INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+  EC2_REPOSITORY: ${{ secrets.EC2_REPOSITORY }}
+  EC2_USER: ${{ secrets.EC2_USER }}
+  AWS_REGION: ap-northeast-2                   
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Deploy Amazon EC2 task definition
+      run: |
+        aws ssm send-command \
+          --document-name "AWS-RunShellScript" \
+          --instance-ids  $EC2_INSTANCE_ID \
+          --parameters commands="cd $EC2_REPOSITORY && sudo -u $EC2_USER git pull origin master"
