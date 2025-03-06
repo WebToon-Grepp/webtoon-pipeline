@@ -45,10 +45,10 @@ with DAG(
         on_failure_callback=[task_failure_alert]
     )
 
-    trigger_process_task = TriggerDagRunOperator(
-        task_id="trigger_process",
-        trigger_dag_id="process_naver_daily_data",
+    trigger_optimize_task = TriggerDagRunOperator(
+        task_id="trigger_optimize",
+        trigger_dag_id="optimize_naver_daily_data",
         wait_for_completion=False
     )
 
-    fetch_data_task >> upload_raw_data_to_s3_task >> trigger_process_task
+    fetch_data_task >> upload_raw_data_to_s3_task >> trigger_optimize_task
