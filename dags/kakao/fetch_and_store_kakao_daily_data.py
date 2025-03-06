@@ -21,7 +21,7 @@ def fetch_data(**kwargs):
 
 with DAG(
     dag_id="fetch_and_store_kakao_daily_data",
-    schedule_interval="0 3 * * *", # 한국 시간 12시
+    schedule_interval="@daily", # 한국 시간 9시
     start_date=datetime(2025, 2, 26),
     catchup=False,
     on_success_callback=dag_success_alert,
