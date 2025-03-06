@@ -11,10 +11,10 @@ WITH join_titles_episodes AS (
         SUM(e.comments) AS comments, 
         t.release_day, 
         t.is_completed 
-    FROM external.episodes e 
-    LEFT JOIN external.titles t 
-        ON e.platform = t.platform 
-        AND e.title_id = t.id 
+    FROM {{ ref('stg_latest_episodes') }} e 
+    LEFT JOIN {{ ref('stg_latest_titles') }} t 
+        ON e.title_id = t.id 
+        AND e.platform = t.platform 
     GROUP BY 
         t.platform, 
         t.id, 
@@ -27,5 +27,7 @@ WITH join_titles_episodes AS (
 
 )
 
-SELECT DISTINCT *
-FROM join_titles_episodes
+SELECT DISTINCT 
+    *
+FROM 
+    join_titles_episodes
