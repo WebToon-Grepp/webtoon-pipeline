@@ -12,14 +12,14 @@ from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 with DAG(
     dag_id="process_naver_daily_data",
-    schedule_interval=None, # fetch_and_store_naver_daily_data Trigger
+    schedule_interval=None, # optimize_naver_daily_data Trigger
     start_date=datetime(2025, 2, 26),
     catchup=False,
     on_success_callback=dag_success_alert,
     tags=["trigger", "daily", "spark", "s3", "process", "naver"],
 ) as dag:
     
-    transform_data_task = SparkSubmitOperator(
+    processing_data_task = SparkSubmitOperator(
         task_id="transform_data",
         application="/opt/airflow/crawler/naver/processer.py", 
         packages="org.apache.hadoop:hadoop-aws:3.2.2",
@@ -36,4 +36,4 @@ with DAG(
         wait_for_completion=False
     )
 
-    transform_data_task >> trigger_load_task
+    processing_data_task >> trigger_load_task
