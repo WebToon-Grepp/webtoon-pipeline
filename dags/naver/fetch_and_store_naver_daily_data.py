@@ -15,6 +15,7 @@ from plugins.slack_callback import dag_success_alert, task_failure_alert
 from crawler.naver import fetcher
 
 def fetch_data(**kwargs):
+    os.environ["NAVER_COOKIE"] = Variable.get("NAVER_COOKIE")
     execution_date = datetime.now()
     target_day = execution_date.weekday()
     
@@ -32,9 +33,6 @@ with DAG(
     fetch_data_task = PythonOperator(
         task_id="fetch_data",
         python_callable=fetch_data,
-        env_vars = {
-            "NAVER_COOKIE": Variable.get("NAVER_COOKIE")
-        },
         on_failure_callback=[task_failure_alert]
     )
 
