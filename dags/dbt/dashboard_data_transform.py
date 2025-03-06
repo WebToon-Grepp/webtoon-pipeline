@@ -8,11 +8,11 @@ DBT_PATH = '/home/airflow/.local/bin'
 DBT_PROJECT_DIR = '/opt/airflow/analytics'
 
 with DAG(
-    dag_id="execute_dbt_analytics",
+    dag_id="dashboard_data_transform",
     schedule_interval=None, # Trigger
     start_date=datetime(2025, 2, 26), 
     catchup=False, 
-    tags=["trigger", "analytics", "dbt", "redshift"], 
+    tags=["trigger", "dashboard", "transform", "dbt", "redshift"], 
 ) as dag:
     
     run_dbt_model_task = BashOperator(
@@ -26,7 +26,7 @@ with DAG(
         },
         bash_command=f"""
             cd {DBT_PROJECT_DIR} &&
-            {DBT_PATH}/dbt run --profiles-dir {DBT_PROJECT_DIR}
+            {DBT_PATH}/dbt run --profiles-dir {DBT_PROJECT_DIR} --target analytics --models staging dashboard
         """
     )
 

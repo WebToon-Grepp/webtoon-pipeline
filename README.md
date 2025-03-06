@@ -31,7 +31,7 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 
 1. `fetch_and_store_<platform>_daily_data`
     - 웹툰 데이터를 매일 수집하여 원시 데이터를 저장소에 저장
-    - 트리거 시점: 한국 시간(KST) 기준 매일 12시에 자동으로 실행
+    - 트리거 시점: 한국 시간(KST) 기준 매일 9시에 자동으로 실행
 2. `optimize_<platform>_daily_data`
     - 수집된 대용량 원시 데이터를 분석에 용이하게 최적화 진행
     - 트리거 시점: `fetch_and_store_<platform>_daily_data`가 성공적으로 완료된 후 자동으로 실행
@@ -41,9 +41,17 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 3. `load_<platform>_daily_data`
     - 변환된 데이터를 최종 데이터 웨어하우스 또는 데이터베이스에 로드
     - 트리거 시점: `process_<platform>_daily_data`가 완료된 후 자동으로 실행
-4. `execute_dbt_analytics`
-    - 웨어하우스의 데이터를 실사용할 데이터로 변환
-    - 트리거 시점: `load_<platform>_daily_data`가 완료된 후 자동으로 실행 (현재 미지정)
+
+### dbt Dag
+1. `import_external_tables`
+    - 외부 테이블을 내부 테이블로 변환
+    - 트리거 시점: 한국 시간(KST) 기준 매일 12시에 자동으로 실행
+2. `dashboard_data_transform`
+    - Superset 시각화 모델 변환
+    - 트리거 시점: `import_external_tables`가 완료된 후 자동으로 실행 (현재 미지정)
+2. `site_data_transform`
+    - Django 사이트 시각화 모델 변환
+    - 트리거 시점: `import_external_tables`가 완료된 후 자동으로 실행 (현재 미지정)
 
 ### Init Dag
 이 DAG들은 최초 프로젝트 시작 시에 한 번만 실행되며, 이후에는 재실행하지 않아도 됩니다.
@@ -57,7 +65,7 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 이 모든 작업은 순차적으로 트리거가 걸려 실행되며 흐름은 다음과 같습니다.
 
 ```
-fetch_and_store_daily_data > optimize_daily_data > process_daily_data > load_daily_data > execute_dbt_analytics
+fetch_and_store_daily_data > optimize_daily_data > process_daily_data > load_daily_data
 ```
 
 ## Commit Convention

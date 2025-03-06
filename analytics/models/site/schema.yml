@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: dim_webtoon_list
+    description: "This model contains a list of webtoons with their basic information, including the webtoon ID, title, and the release day."
+    columns:
+      - name: id
+        description: "The unique identifier for each webtoon in the list."
+        data_tests:
+          - not_null
+      - name: title
+        description: "The title of the webtoon."
+        data_tests:
+          - not_null
+      - name: release_day
+        description: "The day of the week when the webtoon episode is released."
+        data_tests:
+          - not_null
+
+  - name: fct_webtoon_episodes
+    description: "This model contains detailed information about webtoon episodes, including the episode ID and the last updated date."
+    columns:
+      - name: title_id
+        description: "The unique identifier for each title."
+        data_tests:
+          - not_null
+      - name: id
+        description: "The unique identifier for each episode."
+        data_tests:
+          - not_null
+      - name: updated_date
+        description: "The date when the episode was last updated."
+        data_tests:
+          - not_null
