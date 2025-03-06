@@ -30,10 +30,10 @@ with DAG(
         on_failure_callback=[task_failure_alert]
     )
 
-    trigger_load_task = TriggerDagRunOperator(
-        task_id="trigger_load",
+    trigger_process_task = TriggerDagRunOperator(
+        task_id="trigger_process",
         trigger_dag_id="process_kakao_daily_data",
         wait_for_completion=False
     )
 
-    optimizing_data_task >> trigger_load_task
+    optimizing_data_task >> trigger_process_task
