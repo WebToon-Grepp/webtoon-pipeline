@@ -38,10 +38,10 @@ with DAG(
     #     wait_for_completion=False
     # )
 
-    # trigger_site_task = TriggerDagRunOperator(
-    #     task_id="trigger_site",
-    #     trigger_dag_id="site_data_transform",
-    #     wait_for_completion=False
-    # )
+    trigger_site_task = TriggerDagRunOperator(
+        task_id="trigger_site",
+        trigger_dag_id="site_data_transform",
+        wait_for_completion=False
+    )
 
-    run_dbt_model_task #>> [trigger_dashboard_task, trigger_site_task]
+    run_dbt_model_task >> trigger_site_task #>> [trigger_dashboard_task, trigger_site_task]
