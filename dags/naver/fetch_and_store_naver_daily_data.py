@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.abspath("/opt/airflow"))
 sys.path.insert(0, os.path.abspath("/opt/airflow/crawler"))
 
 from airflow import DAG
+from airflow.models.variable import Variable
 from airflow.operators.python import PythonOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
@@ -31,6 +32,9 @@ with DAG(
     fetch_data_task = PythonOperator(
         task_id="fetch_data",
         python_callable=fetch_data,
+        env_vars = {
+            "NAVER_COOKIE": Variable.get("NAVER_COOKIE")
+        },
         on_failure_callback=[task_failure_alert]
     )
 
