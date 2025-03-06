@@ -32,9 +32,12 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 1. `fetch_and_store_<platform>_daily_data`
     - 웹툰 데이터를 매일 수집하여 원시 데이터를 저장소에 저장
     - 트리거 시점: 한국 시간(KST) 기준 매일 12시에 자동으로 실행
-2. `process_<platform>_daily_data`
-    - 수집된 원시 데이터를 분석하고 필요한 형태로 변환
+2. `optimize_<platform>_daily_data`
+    - 수집된 대용량 원시 데이터를 분석에 용이하게 최적화 진행
     - 트리거 시점: `fetch_and_store_<platform>_daily_data`가 성공적으로 완료된 후 자동으로 실행
+2. `process_<platform>_daily_data`
+    - 최적화된 원시 데이터를 분석하고 필요한 형태로 변환
+    - 트리거 시점: `optimize_<platform>_daily_data`가 성공적으로 완료된 후 자동으로 실행
 3. `load_<platform>_daily_data`
     - 변환된 데이터를 최종 데이터 웨어하우스 또는 데이터베이스에 로드
     - 트리거 시점: `process_<platform>_daily_data`가 완료된 후 자동으로 실행
@@ -54,7 +57,7 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 이 모든 작업은 순차적으로 트리거가 걸려 실행되며 흐름은 다음과 같습니다.
 
 ```
-fetch_and_store_daily_data > process_daily_data > load_daily_data > execute_dbt_analytics
+fetch_and_store_daily_data > optimize_daily_data > process_daily_data > load_daily_data > execute_dbt_analytics
 ```
 
 ## Commit Convention
