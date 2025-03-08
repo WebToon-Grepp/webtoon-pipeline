@@ -16,6 +16,5 @@ SELECT DISTINCT
     comments,
     image_url,
     updated_date
-FROM 
-    episodes
+FROM episodes
 

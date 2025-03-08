@@ -1,18 +1,18 @@
 WITH join_titles_episodes AS (
-
+    
     SELECT 
         t.platform, 
         t.id, 
         t.title, 
         t.author, 
         t.image_url, 
-        t.views, 
+        t.views,
         SUM(e.likes) AS likes, 
         SUM(e.comments) AS comments, 
         t.release_day, 
         t.is_completed 
     FROM {{ ref('stg_latest_episodes') }} e 
-    LEFT JOIN {{ ref('stg_latest_titles') }} t 
+    INNER JOIN {{ ref('stg_latest_titles') }} t 
         ON e.title_id = t.id 
         AND e.platform = t.platform 
     GROUP BY 
@@ -29,5 +29,4 @@ WITH join_titles_episodes AS (
 
 SELECT DISTINCT 
     *
-FROM 
-    join_titles_episodes
+FROM join_titles_episodes
