@@ -11,7 +11,7 @@ SELECT DISTINCT
     platform,
     title_id,
     id,
-    title,
+    REPLACE(title, '"', '') AS title,
     likes,
     comments,
     image_url,

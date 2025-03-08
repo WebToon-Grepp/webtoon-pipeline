@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath("/opt/airflow"))
 from airflow import DAG
 from airflow.models.variable import Variable
 from airflow.operators.bash import BashOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 DBT_PATH = '/home/airflow/.local/bin'
@@ -52,5 +53,11 @@ with DAG(
         """,
         on_failure_callback=[task_failure_alert]
     )
+    
+    trigger_transfer_task = TriggerDagRunOperator(
+        task_id="trigger_transfer",
+        trigger_dag_id="site_data_transfer",
+        wait_for_completion=False
+    )
 
-    run_dbt_model_task >> test_dbt_model_task
+    run_dbt_model_task >> test_dbt_model_task >> trigger_transfer_task

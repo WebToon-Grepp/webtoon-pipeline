@@ -9,7 +9,6 @@ WITH join_webtoon_list_genres AS (
         wl.views, 
         wl.likes, 
         wl.comments, 
-        wl.release_day,
         g.genre_name
     FROM raw_data.genres g
     LEFT JOIN {{ ref('dim_webtoon_list') }} wl
