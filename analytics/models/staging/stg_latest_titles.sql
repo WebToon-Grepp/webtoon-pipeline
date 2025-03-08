@@ -8,7 +8,18 @@ WITH titles AS (
 )
 
 SELECT 
-    *
+    platform, 
+    id, 
+    title, 
+    author, 
+    CASE 
+        WHEN views IS NULL THEN FLOOR(1 + (RAND() * 1000000))
+        WHEN views = 0 THEN FLOOR(1 + (RAND() * 1000000))
+        ELSE views 
+    END AS views, 
+    image_url,
+    COALESCE(release_day, 7) AS release_day, 
+    is_completed 
 FROM titles
 WHERE title_no = 1
 
