@@ -1,4 +1,8 @@
+import sys
+import os
 from datetime import datetime
+
+sys.path.insert(0, os.path.abspath("/opt/airflow"))
 
 from airflow import DAG
 from airflow.models.variable import Variable
