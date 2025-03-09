@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: dim_webtoon_list
+  - name: dim_webtoon_titles
     description: "This model contains a list of webtoons with their basic information, including the webtoon ID, title, and the release day."
     columns:
       - name: id
@@ -14,14 +14,6 @@ models:
           - not_null
       - name: release_day
         description: "The day of the week when the webtoon episode is released."
-        data_tests:
-          - not_null
-
-  - name: dim_webtoon_genres
-    description: "This model contains a list of webtoons with their associated genre information, including the genre name and related webtoon details."
-    columns:
-      - name: genre_name
-        description: "The name of the genre associated with the webtoon. Each genre represents a category under which webtoons are classified."
         data_tests:
           - not_null
 
