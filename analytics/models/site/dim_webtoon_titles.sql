@@ -11,9 +11,9 @@ WITH join_titles_genres AS (
         tt.comments, 
         tt.release_day, 
         tt.is_completed, 
-        g.genre_name
+        COALESCE(g.genre_name, '완결') AS genre_name
     FROM raw_data.genres g
-    LEFT JOIN {{ ref('stg_total_titles') }} tt
+    FULL JOIN {{ ref('stg_total_titles') }} tt
         ON g.title_id = tt.id 
         AND g.platform = tt.platform 
 )
