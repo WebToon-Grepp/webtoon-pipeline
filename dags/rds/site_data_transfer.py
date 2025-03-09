@@ -19,25 +19,14 @@ with DAG(
     tags=["trigger", "site", "transfer", "s3", "redshift"], 
 ) as dag:
 
-    transfer_dim_webtoon_list_task = RedshiftToS3Operator(
-        task_id="transfer_dim_webtoon_list",
+    transfer_dim_webtoon_titles_task = RedshiftToS3Operator(
+        task_id="transfer_dim_webtoon_titles",
         s3_bucket="wt-grepp-lake",
-        s3_key="redshift/dim_webtoon_list",
+        s3_key="redshift/dim_webtoon_titles",
         schema="analytics",
-        table="dim_webtoon_list",
+        table="dim_webtoon_titles",
         include_header=True,
         unload_options=["ALLOWOVERWRITE", "DELIMITER ','", "ADDQUOTES", "PARALLEL OFF", ],
-        on_failure_callback=[task_failure_alert]
-    )
-
-    transfer_dim_webtoon_genres_task = RedshiftToS3Operator(
-        task_id="transfer_dim_webtoon_genres",
-        s3_bucket="wt-grepp-lake",
-        s3_key="redshift/dim_webtoon_genres",
-        schema="analytics",
-        table="dim_webtoon_genres",
-        include_header=True,
-        unload_options=["ALLOWOVERWRITE", "DELIMITER ','", "ADDQUOTES", "PARALLEL OFF"],
         on_failure_callback=[task_failure_alert]
     )
 
@@ -58,4 +47,4 @@ with DAG(
         wait_for_completion=False
     )
 
-    [transfer_dim_webtoon_list_task, transfer_dim_webtoon_genres_task, transfer_fct_webtoon_episodes_task] >> trigger_copy_task
+    [transfer_dim_webtoon_titles_task, transfer_fct_webtoon_episodes_task] >> trigger_copy_task
