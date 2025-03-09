@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath("/opt/airflow"))
 from airflow import DAG
 from airflow.models.variable import Variable
 from airflow.operators.bash import BashOperator
+from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from plugins.slack_callback import dag_success_alert, task_failure_alert
 
@@ -15,12 +16,34 @@ DBT_PROJECT_DIR = '/opt/airflow/analytics'
 
 with DAG(
     dag_id="import_external_tables",
-    schedule_interval="0 3 * * *", # 한국 시간 12시
+    schedule_interval="@daily", # 한국 시간 9시
     start_date=datetime(2025, 2, 26), 
     catchup=False, 
     tags=["trigger", "external", "internal", "import", "dbt", "redshift"], 
     on_success_callback=dag_success_alert
 ) as dag:
+    
+    wait_for_naver_sensor = ExternalTaskSensor(
+        task_id="wait_for_naver",
+        external_dag_id="load_naver_daily_data",
+        external_task_ids=["add_titles_task", "add_episodes_task", "add_genres_task"],
+        mode="reschedule",
+        timeout=2500,
+        poke_interval=500,
+        allowed_states=["success"],
+        failed_states=["failed", "skipped"]
+    )
+
+    wait_for_kakao_sensor = ExternalTaskSensor(
+        task_id="wait_for_kakao",
+        external_dag_id="load_kakao_daily_data",
+        external_task_ids=["add_titles_task", "add_episodes_task", "add_genres_task"],
+        mode="reschedule",
+        timeout=2500,
+        poke_interval=500,
+        allowed_states=["success"],
+        failed_states=["failed", "skipped"]
+    )
     
     run_dbt_model_task = BashOperator(
         task_id="run_dbt_model",
@@ -51,4 +74,5 @@ with DAG(
         wait_for_completion=False
     )
 
-    run_dbt_model_task >> trigger_site_task #>> [trigger_dashboard_task, trigger_site_task]
+    [wait_for_naver_sensor, wait_for_kakao_sensor] >> run_dbt_model_task >> trigger_site_task 
+                                                                        #>> [trigger_dashboard_task, trigger_site_task]
