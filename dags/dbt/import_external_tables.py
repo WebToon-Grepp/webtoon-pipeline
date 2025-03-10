@@ -26,7 +26,6 @@ with DAG(
     wait_for_naver_sensor = ExternalTaskSensor(
         task_id="wait_for_naver",
         external_dag_id="load_naver_daily_data",
-        external_task_ids=["add_titles_task", "add_episodes_task", "add_genres_task"],
         mode="reschedule",
         timeout=2500,
         poke_interval=500,
@@ -37,7 +36,6 @@ with DAG(
     wait_for_kakao_sensor = ExternalTaskSensor(
         task_id="wait_for_kakao",
         external_dag_id="load_kakao_daily_data",
-        external_task_ids=["add_titles_task", "add_episodes_task", "add_genres_task"],
         mode="reschedule",
         timeout=2500,
         poke_interval=500,
@@ -61,12 +59,11 @@ with DAG(
         on_failure_callback=[task_failure_alert]
     )
 
-    # 추후 진행 예정
-    # trigger_dashboard_task = TriggerDagRunOperator(
-    #     task_id="trigger_dashboard",
-    #     trigger_dag_id="dashboard_data_transform",
-    #     wait_for_completion=False
-    # )
+    trigger_dashboard_task = TriggerDagRunOperator(
+        task_id="trigger_dashboard",
+        trigger_dag_id="dashboard_data_transform",
+        wait_for_completion=False
+    )
 
     trigger_site_task = TriggerDagRunOperator(
         task_id="trigger_site",
@@ -74,5 +71,4 @@ with DAG(
         wait_for_completion=False
     )
 
-    [wait_for_naver_sensor, wait_for_kakao_sensor] >> run_dbt_model_task >> trigger_site_task 
-                                                                        #>> [trigger_dashboard_task, trigger_site_task]
+    [wait_for_naver_sensor, wait_for_kakao_sensor] >> run_dbt_model_task >> [trigger_dashboard_task, trigger_site_task]
