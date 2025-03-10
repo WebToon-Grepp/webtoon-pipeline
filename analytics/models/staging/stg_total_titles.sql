@@ -1,4 +1,4 @@
-WITH join_titles_episodes AS (
+WITH join_stg_titles_episodes AS (
     
     SELECT 
         t.platform, 
@@ -29,4 +29,4 @@ WITH join_titles_episodes AS (
 
 SELECT DISTINCT 
     *
-FROM join_titles_episodes
+FROM join_stg_titles_episodes

@@ -43,10 +43,10 @@ with DAG(
         bash_command="rm -rf /opt/airflow/tmp && mkdir /opt/airflow/tmp",
     )
 
-    copy_dim_webtoon_list_task = PythonOperator(
-        task_id="copy_dim_webtoon_list",
+    copy_dim_webtoon_titles_task = PythonOperator(
+        task_id="copy_dim_webtoon_titles",
         python_callable=download_file_from_s3,
-        op_args=["dim_webtoon_list", 
+        op_args=["dim_webtoon_titles", 
                  """
                     platform CHARACTER VARYING,
                     id BIGINT,
@@ -57,29 +57,10 @@ with DAG(
                     likes DOUBLE PRECISION,
                     comments DOUBLE PRECISION,
                     release_day INTEGER,
-                    is_completed BOOLEAN
-                """, 
-                "platform, id, title, author, image_url, views, likes, comments, release_day, is_completed"
-        ],
-        on_failure_callback=[task_failure_alert]
-    )
-
-    copy_dim_webtoon_genres_task = PythonOperator(
-        task_id="copy_dim_webtoon_genres",
-        python_callable=download_file_from_s3,
-        op_args=["dim_webtoon_genres", 
-                 """
-                    platform CHARACTER VARYING,
-                    id BIGINT,
-                    title CHARACTER VARYING,
-                    author CHARACTER VARYING,
-                    image_url CHARACTER VARYING,
-                    views DOUBLE PRECISION,
-                    likes DOUBLE PRECISION,
-                    comments DOUBLE PRECISION,
+                    is_completed BOOLEAN,
                     genre_name CHARACTER VARYING
-                """,
-                "platform, id, title, author, image_url, views, likes, comments, genre_name"
+                """, 
+                "platform, id, title, author, image_url, views, likes, comments, release_day, is_completed, genre_name"
         ],
         on_failure_callback=[task_failure_alert]
     )
@@ -103,4 +84,4 @@ with DAG(
         on_failure_callback=[task_failure_alert]
     )
 
-    clear_tmp_dir_task >> [copy_dim_webtoon_list_task, copy_dim_webtoon_genres_task, copy_fct_webtoon_episodes_task]
+    clear_tmp_dir_task >> [copy_dim_webtoon_titles_task, copy_fct_webtoon_episodes_task]

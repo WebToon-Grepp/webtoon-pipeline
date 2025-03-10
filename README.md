@@ -42,18 +42,24 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
     - 변환된 데이터를 최종 데이터 웨어하우스 또는 데이터베이스에 로드
     - 트리거 시점: `process_<platform>_daily_data`가 완료된 후 자동으로 실행
 
-### dbt Dag
+### ELT DAG
 1. `import_external_tables`
     - 외부 테이블을 내부 테이블로 변환
-    - 트리거 시점: 한국 시간(KST) 기준 매일 12시에 자동으로 실행
+    - 트리거 시점: 모든 플랫폼이 `load_<platform>_daily_data`가 완료된 후 자동으로 실행
 2. `dashboard_data_transform`
     - Superset 시각화 모델 변환
     - 트리거 시점: `import_external_tables`가 완료된 후 자동으로 실행 (현재 미지정)
 2. `site_data_transform`
-    - Django 사이트 시각화 모델 변환
-    - 트리거 시점: `import_external_tables`가 완료된 후 자동으로 실행 (현재 미지정)
+    - Flask 사이트 시각화 모델 변환
+    - 트리거 시점: `import_external_tables`가 완료된 후 자동으로 실행
+2. `site_data_transfer`
+    - Flask 사이트 시각화 테이블 S3로 데이터 업로드
+    - 트리거 시점: `site_data_transform`가 완료된 후 자동으로 실행
+2. `site_data_copy`
+    - Flask 사이트 시각화 S3 데이터 프로덕션 DB로 업로드
+    - 트리거 시점: `site_data_transfer`가 완료된 후 자동으로 실행
 
-### Init Dag
+### Init DAG
 이 DAG들은 최초 프로젝트 시작 시에 한 번만 실행되며, 이후에는 재실행하지 않아도 됩니다.
 
 1. `init_<platform>_historical_data`
@@ -64,8 +70,14 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 ### DAG Flow
 이 모든 작업은 순차적으로 트리거가 걸려 실행되며 흐름은 다음과 같습니다.
 
+- 데이터 수집
 ```
 fetch_and_store_daily_data > optimize_daily_data > process_daily_data > load_daily_data
+```
+
+- 데이터 정제
+```
+import_external_tables > data_transform > data_transfer > data_copy
 ```
 
 ## Commit Convention
