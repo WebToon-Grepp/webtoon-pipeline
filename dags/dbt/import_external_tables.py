@@ -28,9 +28,7 @@ with DAG(
         external_dag_id="load_naver_daily_data",
         mode="reschedule",
         timeout=2500,
-        poke_interval=500,
-        allowed_states=["success"],
-        failed_states=["failed", "skipped"]
+        poke_interval=500
     )
 
     wait_for_kakao_sensor = ExternalTaskSensor(
@@ -38,9 +36,7 @@ with DAG(
         external_dag_id="load_kakao_daily_data",
         mode="reschedule",
         timeout=2500,
-        poke_interval=500,
-        allowed_states=["success"],
-        failed_states=["failed", "skipped"]
+        poke_interval=500
     )
     
     run_dbt_model_task = BashOperator(
