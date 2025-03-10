@@ -17,4 +17,4 @@ SELECT
 FROM raw_data.titles AS rt
 LEFT JOIN webtoon_popularity_by_day AS day
 ON rt.id = day.title_id
-GROUP BY rt.release_day
+GROUP BY rt.release_day 
