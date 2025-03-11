@@ -26,7 +26,7 @@ with DAG(
         },
         bash_command=f"""
             cd {DBT_PROJECT_DIR} &&
-            {DBT_PATH}/dbt run --profiles-dir {DBT_PROJECT_DIR} --target analytics --models staging dashboard
+            {DBT_PATH}/dbt run --profiles-dir {DBT_PROJECT_DIR} --target analytics --models dashboard
         """
     )
 

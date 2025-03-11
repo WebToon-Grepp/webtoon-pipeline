@@ -33,7 +33,7 @@ with DAG(
         },
         bash_command=f"""
             cd {DBT_PROJECT_DIR} &&
-            {DBT_PATH}/dbt run --profiles-dir {DBT_PROJECT_DIR} --target analytics --models staging site
+            {DBT_PATH}/dbt run --profiles-dir {DBT_PROJECT_DIR} --target analytics --models site
         """,
         on_failure_callback=[task_failure_alert]
     )
@@ -49,7 +49,7 @@ with DAG(
         },
         bash_command=f"""
             cd {DBT_PROJECT_DIR} &&
-            {DBT_PATH}/dbt test --profiles-dir {DBT_PROJECT_DIR} --target analytics --models staging site
+            {DBT_PATH}/dbt test --profiles-dir {DBT_PROJECT_DIR} --target analytics --models site
         """,
         on_failure_callback=[task_failure_alert]
     )
