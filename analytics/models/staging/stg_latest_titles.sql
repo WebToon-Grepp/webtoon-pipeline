@@ -2,7 +2,8 @@ WITH titles AS (
 
     SELECT 
         *, 
-       ROW_NUMBER() OVER (PARTITION BY id, release_day ORDER BY views DESC) AS title_no
+       TO_DATE(year || '-' || month || '-' || day, 'YYYY-MM-DD') AS data_date,
+       ROW_NUMBER() OVER (PARTITION BY platform, id, release_day ORDER BY data_date DESC) AS title_no
     FROM raw_data.titles
 
 )
