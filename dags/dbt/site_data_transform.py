@@ -57,7 +57,9 @@ with DAG(
     trigger_transfer_task = TriggerDagRunOperator(
         task_id="trigger_transfer",
         trigger_dag_id="site_data_transfer",
-        wait_for_completion=False
+        wait_for_completion=True,
+        poke_interval=100,
+        deferrable=True
     )
 
     run_dbt_model_task >> test_dbt_model_task >> trigger_transfer_task
