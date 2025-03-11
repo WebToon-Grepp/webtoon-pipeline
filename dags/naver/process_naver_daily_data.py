@@ -34,7 +34,7 @@ with DAG(
         task_id="trigger_load",
         trigger_dag_id="load_naver_daily_data",
         wait_for_completion=True,
-        poke_interval=100,
+        poke_interval=30,
         deferrable=True
     )
 

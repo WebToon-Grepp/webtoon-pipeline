@@ -28,8 +28,8 @@ with DAG(
         external_dag_id="fetch_and_store_naver_daily_data",
         external_task_id="trigger_optimize",
         mode="reschedule",
-        timeout=2500,
-        poke_interval=500,
+        timeout=3000,
+        poke_interval=300,
         allowed_states=["success"],
         failed_states=["failed", "skipped"]
     )
@@ -39,8 +39,8 @@ with DAG(
         external_dag_id="fetch_and_store_kakao_daily_data",
         external_task_id="trigger_optimize",
         mode="reschedule",
-        timeout=2500,
-        poke_interval=500,
+        timeout=3000,
+        poke_interval=300,
         allowed_states=["success"],
         failed_states=["failed", "skipped"]
     )
@@ -80,7 +80,7 @@ with DAG(
         task_id="trigger_dashboard",
         trigger_dag_id="dashboard_data_transform",
         wait_for_completion=True,
-        poke_interval=100,
+        poke_interval=30,
         deferrable=True
     )
 
@@ -88,7 +88,7 @@ with DAG(
         task_id="trigger_site",
         trigger_dag_id="site_data_transform",
         wait_for_completion=True,
-        poke_interval=100,
+        poke_interval=30,
         deferrable=True
     )
 
