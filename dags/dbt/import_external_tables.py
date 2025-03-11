@@ -25,22 +25,28 @@ with DAG(
     
     wait_for_naver_sensor = ExternalTaskSensor(
         task_id="wait_for_naver",
-        external_dag_id="load_naver_daily_data",
+        external_dag_id="fetch_and_store_naver_daily_data",
+        external_task_id="trigger_optimize",
         mode="reschedule",
         timeout=2500,
-        poke_interval=500
+        poke_interval=500,
+        allowed_states=["success"],
+        failed_states=["failed", "skipped"]
     )
 
     wait_for_kakao_sensor = ExternalTaskSensor(
         task_id="wait_for_kakao",
-        external_dag_id="load_kakao_daily_data",
+        external_dag_id="fetch_and_store_kakao_daily_data",
+        external_task_id="trigger_optimize",
         mode="reschedule",
         timeout=2500,
-        poke_interval=500
+        poke_interval=500,
+        allowed_states=["success"],
+        failed_states=["failed", "skipped"]
     )
     
-    run_dbt_model_task = BashOperator(
-        task_id="run_dbt_model",
+    run_dbt_import_task = BashOperator(
+        task_id="run_dbt_import",
         env={
             "DBT_DBNAME": Variable.get("DBT_DBNAME"),
             "DBT_HOST": Variable.get("DBT_HOST"),
@@ -54,17 +60,36 @@ with DAG(
         """,
         on_failure_callback=[task_failure_alert]
     )
+    
+    run_dbt_staging_task = BashOperator(
+        task_id="run_dbt_staging",
+        env={
+            "DBT_DBNAME": Variable.get("DBT_DBNAME"),
+            "DBT_HOST": Variable.get("DBT_HOST"),
+            "DBT_PASSWORD": Variable.get("DBT_PASSWORD"),
+            "DBT_SCHEMA": Variable.get("DBT_SCHEMA"),
+            "DBT_USER": Variable.get("DBT_USER")
+        },
+        bash_command=f"""
+            cd {DBT_PROJECT_DIR} &&
+            {DBT_PATH}/dbt run --profiles-dir {DBT_PROJECT_DIR} --target analytics --models staging
+        """
+    )
 
     trigger_dashboard_task = TriggerDagRunOperator(
         task_id="trigger_dashboard",
         trigger_dag_id="dashboard_data_transform",
-        wait_for_completion=False
+        wait_for_completion=True,
+        poke_interval=100,
+        deferrable=True
     )
 
     trigger_site_task = TriggerDagRunOperator(
         task_id="trigger_site",
         trigger_dag_id="site_data_transform",
-        wait_for_completion=False
+        wait_for_completion=True,
+        poke_interval=100,
+        deferrable=True
     )
 
-    [wait_for_naver_sensor, wait_for_kakao_sensor] >> run_dbt_model_task >> [trigger_dashboard_task, trigger_site_task]
+    [wait_for_naver_sensor, wait_for_kakao_sensor] >> run_dbt_import_task >> run_dbt_staging_task >> [trigger_dashboard_task, trigger_site_task]

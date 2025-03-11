@@ -33,7 +33,9 @@ with DAG(
     trigger_process_task = TriggerDagRunOperator(
         task_id="trigger_process",
         trigger_dag_id="process_kakao_daily_data",
-        wait_for_completion=False
+        wait_for_completion=True,
+        poke_interval=100,
+        deferrable=True
     )
 
     optimizing_data_task >> trigger_process_task

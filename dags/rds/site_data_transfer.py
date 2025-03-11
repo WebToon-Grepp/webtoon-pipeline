@@ -44,7 +44,9 @@ with DAG(
     trigger_copy_task = TriggerDagRunOperator(
         task_id="trigger_copy",
         trigger_dag_id="site_data_copy",
-        wait_for_completion=False
+        wait_for_completion=True,
+        poke_interval=100,
+        deferrable=True
     )
 
     [transfer_dim_webtoon_titles_task, transfer_fct_webtoon_episodes_task] >> trigger_copy_task

@@ -48,7 +48,9 @@ with DAG(
     trigger_optimize_task = TriggerDagRunOperator(
         task_id="trigger_optimize",
         trigger_dag_id="optimize_naver_daily_data",
-        wait_for_completion=False
+        wait_for_completion=True,
+        poke_interval=100,
+        deferrable=True
     )
 
     fetch_data_task >> upload_raw_data_to_s3_task >> trigger_optimize_task
