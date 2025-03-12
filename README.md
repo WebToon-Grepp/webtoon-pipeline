@@ -35,27 +35,27 @@ DAG는 매일 지정된 시간에 자동으로 실행되며, 모든 작업 흐�
 2. `optimize_<platform>_daily_data`
     - 수집된 대용량 원시 데이터를 분석에 용이하게 최적화 진행
     - 트리거 시점: `fetch_and_store_<platform>_daily_data`가 성공적으로 완료된 후 자동으로 실행
-2. `process_<platform>_daily_data`
+3. `process_<platform>_daily_data`
     - 최적화된 원시 데이터를 분석하고 필요한 형태로 변환
     - 트리거 시점: `optimize_<platform>_daily_data`가 성공적으로 완료된 후 자동으로 실행
-3. `load_<platform>_daily_data`
+4. `load_<platform>_daily_data`
     - 변환된 데이터를 최종 데이터 웨어하우스 또는 데이터베이스에 로드
     - 트리거 시점: `process_<platform>_daily_data`가 완료된 후 자동으로 실행
 
 ### ELT DAG
 1. `import_external_tables`
     - 외부 테이블을 내부 테이블로 변환
-    - 트리거 시점: 모든 플랫폼이 `load_<platform>_daily_data`가 완료된 후 자동으로 실행
+    - 트리거 시점: 모든 플랫폼 `fetch_and_store_<platform>_daily_data`가 완료된 후 자동으로 실행
 2. `dashboard_data_transform`
     - Superset 시각화 모델 변환
     - 트리거 시점: `import_external_tables`가 완료된 후 자동으로 실행 (현재 미지정)
-2. `site_data_transform`
+3. `site_data_transform`
     - Flask 사이트 시각화 모델 변환
     - 트리거 시점: `import_external_tables`가 완료된 후 자동으로 실행
-2. `site_data_transfer`
+4. `site_data_transfer`
     - Flask 사이트 시각화 테이블 S3로 데이터 업로드
     - 트리거 시점: `site_data_transform`가 완료된 후 자동으로 실행
-2. `site_data_copy`
+5. `site_data_copy`
     - Flask 사이트 시각화 S3 데이터 프로덕션 DB로 업로드
     - 트리거 시점: `site_data_transfer`가 완료된 후 자동으로 실행
 

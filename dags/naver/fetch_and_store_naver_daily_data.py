@@ -49,7 +49,7 @@ with DAG(
         task_id="trigger_optimize",
         trigger_dag_id="optimize_naver_daily_data",
         wait_for_completion=True,
-        poke_interval=100,
+        poke_interval=150,
         deferrable=True
     )
 

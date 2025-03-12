@@ -2,7 +2,8 @@ WITH episodes AS (
 
     SELECT 
         *, 
-       ROW_NUMBER() OVER (PARTITION BY platform, title_id ORDER BY updated_date DESC, id DESC) AS episode_no
+       TO_DATE(year || '-' || month || '-' || day, 'YYYY-MM-DD') AS data_date,
+       ROW_NUMBER() OVER (PARTITION BY platform, title_id, id ORDER BY data_date DESC, id DESC) AS episode_no
     FROM raw_data.episodes
 
 )
@@ -19,5 +20,5 @@ SELECT
         (CURRENT_DATE - INTERVAL '1 day' * FLOOR(RANDOM() * 1825))::DATE
     ) AS updated_date
 FROM episodes
-WHERE episode_no < 100
+WHERE episode_no = 1
 

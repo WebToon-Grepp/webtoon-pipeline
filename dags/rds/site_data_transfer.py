@@ -45,7 +45,7 @@ with DAG(
         task_id="trigger_copy",
         trigger_dag_id="site_data_copy",
         wait_for_completion=True,
-        poke_interval=100,
+        poke_interval=30,
         deferrable=True
     )
 
