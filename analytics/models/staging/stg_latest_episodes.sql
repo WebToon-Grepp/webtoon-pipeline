@@ -16,9 +16,7 @@ SELECT
     COALESCE(likes, FLOOR(1 + (RAND() * 3000))) AS likes,
     COALESCE(comments, FLOOR(1 + (RAND() * 100))) AS comments,
     image_url,
-    COALESCE(updated_date, 
-        (CURRENT_DATE - INTERVAL '1 day' * FLOOR(RANDOM() * 1825))::DATE
-    ) AS updated_date
+    updated_date
 FROM episodes
 WHERE episode_no = 1
 
