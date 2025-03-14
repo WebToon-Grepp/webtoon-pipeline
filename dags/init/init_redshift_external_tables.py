@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath("/opt/airflow"))
 from airflow import DAG
 from airflow.models.variable import Variable
 from airflow.operators.python import PythonOperator
-from plugins.redshift_hook import RedshiftHook
+from plugins.dbshell_hook import DBShellHook
 from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 DATABASE = "wt-grepp-spectrum"
@@ -24,7 +24,10 @@ def create_external_redshift_schema(**kwargs):
         CREATE EXTERNAL DATABASE IF NOT EXISTS;
     """
     
-    redshift_hook = RedshiftHook(query=query)
+    redshift_hook = DBShellHook(
+        dbshell_conn_id="redshift_default",
+        query=query
+    )
     redshift_hook.execute_query()
 
 def create_external_titles_table(**kwargs):
@@ -43,7 +46,10 @@ def create_external_titles_table(**kwargs):
         LOCATION 's3://{BUCKET}/processed/titles/';
     """
     
-    redshift_hook = RedshiftHook(query=query)
+    redshift_hook = DBShellHook(
+        dbshell_conn_id="redshift_default",
+        query=query
+    )
     redshift_hook.execute_query()
 
 def create_external_episodes_table(**kwargs):
@@ -62,7 +68,10 @@ def create_external_episodes_table(**kwargs):
         LOCATION 's3://{BUCKET}/processed/episodes/';
     """
     
-    redshift_hook = RedshiftHook(query=query)
+    redshift_hook = DBShellHook(
+        dbshell_conn_id="redshift_default",
+        query=query
+    )
     redshift_hook.execute_query()
 
 def create_external_genres_table(**kwargs):
@@ -76,7 +85,10 @@ def create_external_genres_table(**kwargs):
         LOCATION 's3://{BUCKET}/processed/genres/';
     """
     
-    redshift_hook = RedshiftHook(query=query)
+    redshift_hook = DBShellHook(
+        dbshell_conn_id="redshift_default",
+        query=query
+    )
     redshift_hook.execute_query()
 
 with DAG(
