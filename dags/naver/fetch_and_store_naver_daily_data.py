@@ -8,7 +8,6 @@ sys.path.insert(0, os.path.abspath("/opt/airflow/crawler"))
 from airflow import DAG
 from airflow.models.variable import Variable
 from airflow.operators.python import PythonOperator
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from plugins.local_dir_to_s3 import LocalFoldersystemToS3Operator
 from plugins.slack_callback import dag_success_alert, task_failure_alert
 
@@ -23,7 +22,7 @@ def fetch_data(**kwargs):
 
 with DAG(
     dag_id="fetch_and_store_naver_daily_data",
-    schedule_interval="@daily", # 한국 시간 9시
+    schedule_interval=None, # daily_dag_controller Trigger
     start_date=datetime(2025, 2, 26),
     catchup=False,
     on_success_callback=dag_success_alert,
@@ -45,12 +44,4 @@ with DAG(
         on_failure_callback=[task_failure_alert]
     )
 
-    trigger_optimize_task = TriggerDagRunOperator(
-        task_id="trigger_optimize",
-        trigger_dag_id="optimize_naver_daily_data",
-        wait_for_completion=True,
-        poke_interval=150,
-        deferrable=True
-    )
-
-    fetch_data_task >> upload_raw_data_to_s3_task >> trigger_optimize_task
+    fetch_data_task >> upload_raw_data_to_s3_task

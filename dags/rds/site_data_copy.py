@@ -9,7 +9,7 @@ from airflow import DAG
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-from plugins.rds_hook import RDSHook
+from plugins.dbshell_hook import DBShellHook
 from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 def download_file_from_s3(key, column, copy_col):
@@ -20,7 +20,7 @@ def download_file_from_s3(key, column, copy_col):
         local_path="/opt/airflow/tmp"
     )
 
-    rds_hook = RDSHook()
+    rds_hook = DBShellHook(dbshell_conn_id="postgres_default")
     query = f" DROP TABLE IF EXISTS site.{key};"
     rds_hook.execute_query(query)
 

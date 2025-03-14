@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath("/opt/airflow"))
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from plugins.redshift_hook import RedshiftHook
+from plugins.dbshell_hook import DBShellHook
 from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 BUCKET = "wt-grepp-lake"
@@ -17,7 +17,7 @@ def add_partition(target, **kwargs):
     month = execution_date.month
     day = execution_date.day
 
-    redshift_hook = RedshiftHook()
+    redshift_hook = DBShellHook(dbshell_conn_id="redshift_default")
     query = f"""
         ALTER TABLE external.{target}
         ADD PARTITION (year = {year}, month = {month:02d}, day = {day:02d}, platform = 'naver')

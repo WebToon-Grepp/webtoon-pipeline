@@ -12,7 +12,7 @@ from plugins.slack_callback import dag_success_alert, task_failure_alert
 
 with DAG(
     dag_id="optimize_kakao_daily_data",
-    schedule_interval=None, # fetch_and_store_kakao_daily_data Trigger
+    schedule_interval=None, # daily_dag_controller Trigger
     start_date=datetime(2025, 2, 26),
     catchup=False,
     on_success_callback=dag_success_alert,
