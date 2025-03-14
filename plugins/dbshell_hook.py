@@ -3,20 +3,20 @@ from airflow.hooks.base import BaseHook
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.hooks.subprocess import SubprocessHook
 
-class RDSHook():
+class DBShellHook():
     
     def __init__(
-        self, *args, query: str | None = None, rds_conn_id: str = "postgres_default", **kwargs
+        self, *args, query: str | None = None, dbshell_conn_id: str = "postgres_default", **kwargs
     ) -> None:
         self.query = query
-        self.rds_conn_id = rds_conn_id
+        self.dbshell_conn_id = dbshell_conn_id
         
     def copy_file(self, table, tmp_file, tmp_col):
-        rds_hook = SubprocessHook()
-        conn = BaseHook.get_connection(self.rds_conn_id)
+        hook = SubprocessHook()
+        conn = BaseHook.get_connection(self.dbshell_conn_id)
         try:
             query = f"\copy {table} ({tmp_col}) from '{tmp_file}' with delimiter ',' csv header;"
-            rds_hook.run_command(
+            hook.run_command(
                 command=["bash", "-c", f"PGPASSWORD=\"{conn.password}\" psql --host {conn.host} --username {conn.login} --port {conn.port} --dbname {conn.schema} -c \"{query}\""]
             )
             print(f"Successfully copied data from {tmp_file} to table {table}.")
@@ -31,8 +31,8 @@ class RDSHook():
             query = self.query
         print(query)
 
-        rds_hook = PostgresHook(postgres_conn_id=self.rds_conn_id)
-        conn = rds_hook.get_conn()
+        hook = PostgresHook(postgres_conn_id=self.dbshell_conn_id)
+        conn = hook.get_conn()
         conn.autocommit = autocommit
         cursor = conn.cursor()
         
