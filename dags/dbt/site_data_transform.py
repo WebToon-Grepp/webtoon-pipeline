@@ -25,6 +25,11 @@ with DAG(
     run_dbt_model_task = BashOperator(
         task_id="run_dbt_model",
         env={
+            "DBT_DBNAME": Variable.get("DBT_DBNAME"),
+            "DBT_HOST": Variable.get("DBT_HOST"),
+            "DBT_PASSWORD": Variable.get("DBT_PASSWORD"),
+            "DBT_SCHEMA": Variable.get("DBT_SCHEMA"),
+            "DBT_USER": Variable.get("DBT_USER")
         },
         bash_command=f"""
             cd {DBT_PROJECT_DIR} &&
@@ -36,6 +41,11 @@ with DAG(
     test_dbt_model_task = BashOperator(
         task_id="test_dbt_model",
         env={
+            "DBT_DBNAME": Variable.get("DBT_DBNAME"),
+            "DBT_HOST": Variable.get("DBT_HOST"),
+            "DBT_PASSWORD": Variable.get("DBT_PASSWORD"),
+            "DBT_SCHEMA": Variable.get("DBT_SCHEMA"),
+            "DBT_USER": Variable.get("DBT_USER")
         },
         bash_command=f"""
             cd {DBT_PROJECT_DIR} &&
