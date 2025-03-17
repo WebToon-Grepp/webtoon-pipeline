@@ -8,9 +8,9 @@ WITH new_webtoons AS (
         is_completed,
         TO_DATE(year::TEXT || '-' || LPAD(month::TEXT, 2, '0') || '-' || LPAD(day::TEXT, 2, '0'), 'YYYY-MM-DD') AS start_date
     FROM raw_data.titles
-    WHERE platform = 'naver'
+    WHERE platform = 'kakao'
     AND TO_DATE(year::TEXT || '-' || LPAD(month::TEXT, 2, '0') || '-' || LPAD(day::TEXT, 2, '0'), 'YYYY-MM-DD')
-        >= DATEADD(day, -30, CURRENT_DATE)  -- 최근 30일 내 웹툰만 포함
+        BETWEEN DATEADD(day, -30, CURRENT_DATE) AND CURRENT_DATE  -- 🚀 미래 데이터 제외
 ),
 daily_growth AS (
     -- 신규 웹툰의 일별 좋아요 & 댓글 증가량 계산 (최근 30일)
@@ -21,8 +21,8 @@ daily_growth AS (
         COALESCE(SUM(e.comments), 0) AS daily_comments  
     FROM raw_data.episodes e
     INNER JOIN new_webtoons nw ON e.title_id = nw.title_id  
-    WHERE e.platform = 'naver'
-    AND e.updated_date >= DATEADD(day, -30, CURRENT_DATE)  -- 최근 30일치 데이터만 포함
+    WHERE e.platform = 'kakao'
+    AND e.updated_date BETWEEN DATEADD(day, -30, CURRENT_DATE) AND CURRENT_DATE  -- 🚀 미래 데이터 필터링 추가
     GROUP BY e.title_id, e.updated_date
 ),
 growth_summary AS (
